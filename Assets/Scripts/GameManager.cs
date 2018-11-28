@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
-
-
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;       //Allows us to use Lists. 
 using UnityEngine.UI;                   //Allows us to use UI.
 
@@ -21,103 +20,118 @@ public class GameManager : MonoBehaviour
     private List<Enemy> enemies;                          //List of all Enemy units, used to issue them move commands.
     private bool enemiesMoving;                             //Boolean to check if enemies are moving.
     private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
+    
+    private Text timeText;
 
 
-
-    //Awake is always called before any Start functions
+    //Awake is always called before any Start functions - Start関数が呼び出される前に毎回呼び出される
     void Awake()
     {
-        //Check if instance already exists
-        if (instance == null)
+        //  インスタンスが既に存在しているかチェックする
+        if (instance == null)   //  もしもインスタンスがnullなら
 
-            //if not, set instance to this
+            //  インスタンスにGameManagerに設定する
             instance = this;
 
-        //If instance already exists and it's not this:
+        //  もしインスタンスが存在していてGameManagerでないなら
         else if (instance != this)
 
             //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
             Destroy(gameObject);
 
-        //Sets this to not be destroyed when reloading scene
+        //  シーンをリロードしたときにDontDestroyOnLoadに引数gameObjectを渡して実行
         DontDestroyOnLoad(gameObject);
 
-        //Assign enemies to a new List of Enemy objects.
+        //  敵オブジェクトのリストに敵を割り当てる
         enemies = new List<Enemy>();
 
-        //Get a component reference to the attached BoardManager script
+        //  boardScriptにBoardManagerコンポーネントを取得させる
         boardScript = GetComponent<BoardManager>();
 
-        //Call the InitGame function to initialize the first level 
+        //  1stレベルを初期化するためにInit関数を呼び出す
         InitGame();
     }
 
-    //This is called each time a scene is loaded.
-    void OnLevelWasLoaded(int index)
+
+
+    //  引数にScene scene, LoadSceneMode sceneModeを設定する
+    private void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode)
     {
-        //Add one to our level number.
         level++;
-        //Call InitGame to initialize our level.
         InitGame();
     }
 
-    //Initializes the game for each level.
+    //　それぞれのレベルを初期化する
     void InitGame()
     {
-        //While doingSetup is true the player can't move, prevent player from moving while title card is up.
+        //  doingSetupにtrueを代入し、プレイヤーが動けないようにする
         doingSetup = true;
 
-        //Get a reference to our image LevelImage by finding it by name.
+        //  evelImageに"LevelImage"の名前を見つけて代入する
         levelImage = GameObject.Find("LevelImage");
 
-        //Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
+        //　LevelTextに"LevelText"を探してTextコンポーネントを代入する
         levelText = GameObject.Find("LevelText").GetComponent<Text>();
 
-        //Set the text of levelText to the string "Day" and append the current level number.
+        //  levelTextのtextに"day level"のようにレベル数を表示する
         levelText.text = "Day " + level;
 
-        //Set levelImage to active blocking player's view of the game board during setup.
+        
+        
+        //　gameboardの設定中はレベルイメージを表示させる
         levelImage.SetActive(true);
 
-        //Call the HideLevelImage function with a delay in seconds of levelStartDelay.
+        //  HideLevelImage関数をlevelStartDelay秒後に呼び出す
         Invoke("HideLevelImage", levelStartDelay);
 
-        //Clear any Enemy objects in our List to prepare for next level.
+        //　リストに入ってる敵をすべてクリアーする
         enemies.Clear();
 
-        //Call the SetupScene function of the BoardManager script, pass it current level number.
+        //　現在のレベル数をBoardManagerスクリプトのSetupScene関数を呼ぶ
         boardScript.SetupScene(level);
+
+            
 
     }
 
 
-    //Hides black image used between levels
+    //  HideLevelImage関数の定義
     void HideLevelImage()
     {
-        //Disable the levelImage gameObject.
+        //　levelImageのアクティブをfalseに設定する
         levelImage.SetActive(false);
 
-        //Set doingSetup to false allowing player to move again.
+        //　doingSetupをfalseに設定する
         doingSetup = false;
     }
 
-    //Update is called every frame.
-    void Update()
+    void Start()//  スタート時に呼び出す
     {
-        //Check that playersTurn or enemiesMoving or doingSetup are not currently true.
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+
+    void Update()// 毎フレーム呼び出す
+    {
+
+
+        //　playersTurn、enemiesMovin、doingSetupがtrueなら
         if (playersTurn || enemiesMoving || doingSetup)
 
             //If any of these are true, return and do not start MoveEnemies.
             return;
 
-        //Start moving enemies.
+        //　moveEnemies関数を呼び出す
         StartCoroutine(MoveEnemies());
+
+        
+
     }
 
-    //Call this to add the passed in Enemy to the List of Enemy objects.
+    //  Enemy型のscript変数を引数に関数を定義する
     public void AddEnemyToList(Enemy script)
     {
-        //Add Enemy to List enemies.
+        //引数のscriptを渡してenemiesにaddする
         enemies.Add(script);
     }
 
@@ -166,4 +180,6 @@ public class GameManager : MonoBehaviour
         //Enemies are done moving, set enemiesMoving to false.
         enemiesMoving = false;
     }
+
+
 }

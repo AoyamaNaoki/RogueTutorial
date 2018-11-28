@@ -18,7 +18,7 @@ using UnityEngine.SceneManagement;      //Allows us to use SceneManager
         public AudioClip drinkSound1;
         public AudioClip drinkSound2;
         public AudioClip gameOverSound;
-    private Vector2 douchOrigin = -Vector2.one;
+        private Vector2 douchOrigin = -Vector2.one;
 
 
     private Animator animator;                  //Used to store a reference to the Player's animator component.
