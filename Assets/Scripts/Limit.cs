@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class Limit : MonoBehaviour {
 
-    float seconds = 5;
-    GameManager gameManager = new GameManager();
+    float seconds = 10;
+   // GameManager gameManager;
 
 	// Use this for initialization
 	void Start () {
-		
+       // gameManager = new GameManager();
 	}
 	
 	// Update is called once per frame
@@ -20,9 +20,7 @@ public class Limit : MonoBehaviour {
         seconds -= Time.deltaTime;
         this.GetComponent<Text>().text = "TimeLimit=" + seconds;
         if(seconds <= 0){
-            gameManager.GameOver();
-        }  else{
-            return;
+            GameManager.instance.GameOver();
         }
     }
 }

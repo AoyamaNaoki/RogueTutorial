@@ -73,11 +73,16 @@ public class GameManager : MonoBehaviour
         //　LevelTextに"LevelText"を探してTextコンポーネントを代入する
         levelText = GameObject.Find("LevelText").GetComponent<Text>();
 
+        
+        if(level % 5 != 0) { 
         //  levelTextのtextに"day level"のようにレベル数を表示する
         levelText.text = "Day " + level;
+        }
+        else{
+            levelText.text = "Day " + level + " (ItemStage)";
+        }
 
-        
-        
+
         //　gameboardの設定中はレベルイメージを表示させる
         levelImage.SetActive(true);
 
@@ -88,9 +93,14 @@ public class GameManager : MonoBehaviour
         enemies.Clear();
 
         //　現在のレベル数をBoardManagerスクリプトのSetupScene関数を呼ぶ
-        boardScript.SetupScene(level);
+        if(level % 5 != 0) { 
+            boardScript.SetupScene(level);
+        }
+        else{
+            boardScript.SetupItemScene(level);
+        }
 
-            
+
 
     }
 
@@ -105,6 +115,7 @@ public class GameManager : MonoBehaviour
         doingSetup = false;
     }
 
+  
     void Start()//  スタート時に呼び出す
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -136,7 +147,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    //GameOver is called when the player reaches 0 food points
+    //  foodが0になったらゲームオーバーメソッドを呼び出す
     public void GameOver()
     {
         //Set levelText to display number of levels passed and game over message

@@ -97,6 +97,15 @@ public class BoardManager : MonoBehaviour
 
     }
 
+    public void SetupItemScene(int level)
+    {
+        BoardSetup();
+        InitialiseList();
+        LayoutObjectAtRandom(wallTiles, wallCount.minimum, wallCount.maximum);
+        LayoutObjectAtRandom(foodTiles, foodCount.minimum + 12, foodCount.maximum + 12);
+        Instantiate(exit, new Vector3(columns - 1, rows - 1, 0f), Quaternion.identity);
+    }
+
     // Use this for initialization
     void Start()
     {
